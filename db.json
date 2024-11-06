@@ -1,0 +1,13 @@
+{
+  "users": [
+    {
+      "email": "a@a.com",
+      "password": "$2a$10$JVgnrDswCQ00W5.5COXwIu6IxPd9LqHR75bSgcUVD7f.aCyQITe3W",
+      "username": "aaaaaaaa",
+      "created_at": "2024-10-30T13:01:49.925Z",
+      "isActive": true,
+      "id": 1
+    }
+  ],
+  "events": []
+}

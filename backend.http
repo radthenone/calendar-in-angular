@@ -1,0 +1,19 @@
+### GET request to example server
+# curl -X GET "http://localhost:3000/users" -H "accept: application/json"
+GET http://localhost:3000/users
+accept: application/json
+
+### POST request to example server
+# curl -X POST -H "Content-Type: application/json" -d '{"email": "a@a.com", "password": "123456"}' http://localhost:3000/register
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{"email": "a@a.com", "password": "aaaaaaaa"}
+
+### POST request to example server
+# curl -X POST -H "Content-Type: application/json" -d '{"email": "a@a.com", "password": "123456"}' http://localhost:3000/login
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{"email": "a@a.com", "password": "aaaaaaaa"}
+
