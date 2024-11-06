@@ -1,0 +1,24 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <i class="bi bi-arrow-left-square-fill" (click)="previousMonth()"></i>
+    <h2>{{ currentMonth | titlecase }}</h2>
+    <i class="bi bi-arrow-right-square-fill" (click)="nextMonth()"></i>
+  </div>
+  <div class="calendar-weekdays">
+    <span *ngFor="let weekDay of weekNames">{{ weekDay | titlecase }}</span>
+  </div>
+  <div class="calendar-grid">
+    <div
+      *ngFor="let day of calendar"
+      class="calendar-day"
+      [class.today]="day.isToday"
+      [class.past]="day.isPast"
+      [class.selected]="!day.isPast"
+      [class.future]="!day.isMonthDays && !day.isPast"
+      [class.month-days]="day.isMonthDays"
+      [class.has-events]="hasEvents(day)"
+    >
+      <span class="calendar-day-number">{{ day.date.getDate() }}</span>
+    </div>
+  </div>
+</div>

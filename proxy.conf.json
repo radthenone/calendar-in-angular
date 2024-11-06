@@ -1,0 +1,8 @@
+{
+  "/code": {
+    "target": "https://adgard.net",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

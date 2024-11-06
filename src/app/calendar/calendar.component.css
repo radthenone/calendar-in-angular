@@ -1,0 +1,88 @@
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.calendar-header i {
+  font-size: 40px;
+  color: mediumseagreen;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-gap: 10px;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: grey;
+}
+
+.calendar-weekdays span {
+  margin: 0 10px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-gap: 2px;
+  padding: 2px;
+  border-radius: 4px;
+  text-align: left;
+  background-color: darkslategray;
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+  padding: 8px;
+  background-color: white;
+}
+
+.today {
+  background-color: mediumseagreen;
+}
+
+.past {
+  background-color: rgb(140, 61, 61);
+  color: white;
+}
+
+.month-days {
+  font-weight: bold;
+}
+
+.selected {
+  cursor: pointer;
+}
+
+.selected:hover {
+  background-color: darkslategray;
+}
+
+.selected:active {
+  background-color: darkred;
+}
+
+.future {
+  background-color: rgb(229, 229, 229);
+}
+
+.has-events {
+  background-color: yellow;
+}
