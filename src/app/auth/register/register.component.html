@@ -1,0 +1,88 @@
+<div class="row">
+  <div class="col-xs-12 col-md-6 col-md-offset-3">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          formControlName="email"
+          placeholder="Enter email"
+          autocomplete="email"
+        />
+        <div *ngIf="submitted && fields['email'].errors" class="text-danger">
+          <error-message [control]="fields['email']"></error-message>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          id="username"
+          formControlName="username"
+          placeholder="Enter username"
+          autocomplete="username"
+        />
+        <div *ngIf="submitted && fields['username'].errors" class="text-danger">
+          <error-message [control]="fields['username']"></error-message>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          formControlName="password"
+          placeholder="Enter password"
+          autocomplete="new-password"
+        />
+        <div *ngIf="submitted && fields['password'].errors" class="text-danger">
+          <error-message [control]="fields['password']"></error-message>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          placeholder="Confirm password"
+          autocomplete="new-password"
+        />
+        <div
+          *ngIf="submitted && fields['confirmPassword'].errors"
+          class="text-danger"
+        >
+          <error-message [control]="fields['confirmPassword']"></error-message>
+        </div>
+      </div>
+      <div
+        *ngIf="submitted && registerForm.hasError('passwordsDontMatch')"
+        class="text-danger"
+      >
+        <error-message [control]="registerForm"></error-message>
+      </div>
+
+      <div
+        *ngIf="submitted && registerForm.hasError('serverError')"
+        class="text-danger"
+      >
+        <error-message [control]="registerForm"></error-message>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        [routerLink]="['/auth/login']"
+      >
+        Login
+      </button>
+    </form>
+  </div>
+</div>

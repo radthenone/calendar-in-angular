@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/"
+      ><i class="bi bi-house-door-fill"></i
+    ></a>
+  </div>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" aria-current="page" routerLink="/">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/events">Events</a>
+      </li>
+      <li *ngIf="isAuthenticated" class="nav-item">
+        <a class="nav-link" routerLink="/about">About</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/users">Users</a>
+      </li>
+      <li *ngIf="!isAuthenticated" class="nav-item">
+        <a class="nav-link" routerLink="/auth">Authenticate</a>
+      </li>
+      <li *ngIf="isAuthenticated" class="nav-item">
+        <a class="nav-link" (click)="onLogout()">Logout</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div *ngIf="user">
+  <div class="user-info">
+    <p>Hi {{ user.email }}</p>
+  </div>
+  <app-calendar></app-calendar>
+</div>
+<div *ngIf="!user">
+  <p>To see the calendar you need to authenticate</p>
+  <app-auth></app-auth>
+</div>
