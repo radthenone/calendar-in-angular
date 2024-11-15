@@ -1,4 +1,4 @@
-import { ICalendarEvent } from '../interfaces/events.interface';
+import { ICalendarEvent } from 'interfaces/events.interface';
 
 export class CalendarDay {
   public date: Date;
@@ -7,14 +7,10 @@ export class CalendarDay {
   public isMonthDays: boolean;
   public events: ICalendarEvent[];
 
-  public getDateString(): string {
-    return this.date.toISOString().split('T')[0];
-  }
-
   constructor(date: Date) {
     this.date = date;
     this.isPast = this.setIsPast(date);
-    this.isToday = date.toDateString() === new Date().toDateString();
+    this.isToday = this.setIsToday(date);
     this.isMonthDays = this.setIsMonthDays(date);
     this.events = [];
   }
@@ -30,5 +26,9 @@ export class CalendarDay {
   setIsMonthDays(date: Date): boolean {
     const month = new Date().getMonth();
     return date.getMonth() === month;
+  }
+
+  setIsToday(date: Date): boolean {
+    return date.toDateString() === new Date().toDateString();
   }
 }

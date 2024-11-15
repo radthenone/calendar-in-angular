@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { CalendarDay } from '../../models/calendar.model';
+import { CalendarDay } from 'models/calendar.model';
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css'],
+  providers: [],
 })
 export class CalendarComponent implements OnInit {
   calendar: CalendarDay[];

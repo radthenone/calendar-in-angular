@@ -6,7 +6,7 @@ import {
   Validators,
   FormControl,
 } from '@angular/forms';
-import { AuthResponse } from '../../../interfaces/auth.interface';
+import { AuthResponse } from 'interfaces/auth.interface';
 import { EmailDoesNotExistsValidator } from '../validations/validation.service';
 import { Router } from '@angular/router';
 

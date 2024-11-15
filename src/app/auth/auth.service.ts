@@ -6,10 +6,10 @@ import {
   ILogin,
   IRegister,
   TokenPayload,
-} from '../../interfaces/auth.interface';
+} from 'interfaces/auth.interface';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { User, UserSubject } from '../../models/users.model';
+import { User, UserSubject } from 'models/users.model';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 
@@ -24,10 +24,11 @@ export class AuthService {
     private http: HttpClient,
     private router: Router,
   ) {
-    this.userSubject$ = new BehaviorSubject<UserSubject | null>(null);
+    const authUser = this.accountUser;
+    this.userSubject$ = new BehaviorSubject<UserSubject | null>(authUser);
   }
 
-  private get accountUser(): UserSubject | null {
+  public get accountUser(): UserSubject | null {
     const userString = localStorage.getItem('authUser');
     console.log('userString', userString);
     const userData = userString ? JSON.parse(userString) : null;
@@ -124,9 +125,9 @@ export class AuthService {
       const expirationDate = new Date(payload.exp * 1000);
       if (expirationDate > new Date()) {
         this.userSubject$.next(accountUser);
-        const timeLeft = expirationDate.getTime() - new Date().getTime();
-        this.autoLogout(timeLeft);
       }
+      const timeLeft = expirationDate.getTime() - new Date().getTime();
+      this.autoLogout(timeLeft);
     }
   }
 

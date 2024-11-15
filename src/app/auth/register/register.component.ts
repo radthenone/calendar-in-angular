@@ -7,7 +7,7 @@ import {
   EmailExistsValidator,
   UsernameExistsValidator,
 } from '../validations/validation.service';
-import { AuthResponse } from '../../../interfaces/auth.interface';
+import { AuthResponse } from 'interfaces/auth.interface';
 
 @Component({
   selector: 'app-register',

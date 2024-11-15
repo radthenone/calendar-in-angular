@@ -32,6 +32,18 @@
   color: grey;
 }
 
+@media (max-width: 768px) {
+  .calendar-weekdays {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-weekdays {
+    display: none;
+  }
+}
+
 .calendar-weekdays span {
   margin: 0 10px;
 }

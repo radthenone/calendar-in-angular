@@ -1,7 +1,6 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { map } from 'rxjs/operators';
-import { environment } from '../../../../environment';
 import { Observable } from 'rxjs';
 
 export class ValidationService {

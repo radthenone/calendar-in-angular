@@ -1,21 +1,28 @@
-export interface ICalendarEvent {
+export interface EventMode {
+  mode: 'add' | 'edit';
+}
+
+export interface EventRecurrenceMode {
+  type: 'daily' | 'weekly' | 'monthly';
+}
+
+export interface Event {
   id?: number;
   title: string;
   description?: string;
   startDate: Date;
   endDate: Date;
-  recurrence?: {
-    type: 'daily' | 'weekly' | 'monthly';
-  };
+  recurrence: EventRecurrenceMode;
+  userId: string;
 }
 
-export interface ICalendarEventForm {
+export interface EventForm {
   isOpen: boolean;
-  mode: 'add' | 'edit';
+  mode: EventMode;
   position: {
     x: number;
     y: number;
   };
   selectedDate: Date;
-  selectedEvent?: ICalendarEvent;
+  selectedEvent?: Event;
 }
