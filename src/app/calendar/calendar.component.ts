@@ -6,6 +6,7 @@ import { CalendarDay } from 'models/calendar.model';
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css'],
   providers: [],
+  standalone: false,
 })
 export class CalendarComponent implements OnInit {
   calendar: CalendarDay[];
@@ -71,7 +72,7 @@ export class CalendarComponent implements OnInit {
     this.generateCalendar();
   }
 
-  hasEvents(day: CalendarDay): boolean {
-    return day.events.length > 0;
-  }
+  // hasEvents(day: CalendarDay): boolean {
+  //   return day.events.length > 0;
+  // }
 }

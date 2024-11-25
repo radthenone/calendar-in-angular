@@ -11,14 +11,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "allowedCommonJsDependencies": [
               "crypto-js"
             ],
-            "outputPath": "dist/calendar-in-angular",
+            "outputPath": {
+              "base": "dist/calendar-in-angular"
+            },
             "index": "src/index.html",
-            "main": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -30,7 +31,8 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "browser": "src/main.ts"
           },
           "configurations": {
             "production": {
@@ -49,9 +51,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -63,10 +63,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "calendar-in-angular:build:production"
+              "buildTarget": "calendar-in-angular:build:production"
             },
             "development": {
-              "browserTarget": "calendar-in-angular:build:development"
+              "buildTarget": "calendar-in-angular:build:development"
             }
           },
           "defaultConfiguration": "development",
@@ -77,7 +77,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "calendar-in-angular:build"
+            "buildTarget": "calendar-in-angular:build"
           }
         },
         "test": {

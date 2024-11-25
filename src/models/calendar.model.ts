@@ -1,18 +1,16 @@
-import { ICalendarEvent } from 'interfaces/events.interface';
-
 export class CalendarDay {
   public date: Date;
   public isPast: boolean;
   public isToday: boolean;
   public isMonthDays: boolean;
-  public events: ICalendarEvent[];
+  // public events: ICalendarEvent[];
 
   constructor(date: Date) {
     this.date = date;
     this.isPast = this.setIsPast(date);
     this.isToday = this.setIsToday(date);
     this.isMonthDays = this.setIsMonthDays(date);
-    this.events = [];
+    // this.events = [];
   }
 
   setIsPast(date: Date): boolean {

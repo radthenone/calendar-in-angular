@@ -3,8 +3,9 @@ import { AbstractControl, FormGroup } from '@angular/forms';
 import { ValidationService } from './validation.service';
 
 @Component({
-  selector: 'error-message',
-  templateUrl: './error-message.component.html',
+    selector: 'error-message',
+    templateUrl: './error-message.component.html',
+    standalone: false
 })
 export class ErrorMessageComponent {
   // @ts-ignore
