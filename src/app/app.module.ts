@@ -8,7 +8,7 @@ import { UsersComponent } from './users/users.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { ErrorMessageComponent } from './auth/validations/error-message.component';
 import { PageNotFoundComponent } from './common/page-not-found-component/page-not-found-component.component';
@@ -19,38 +19,32 @@ import { HeaderComponent } from './header/header.component';
 import { FormComponent } from './events/form/form.component';
 import { CalendarComponent } from './calendar/calendar.component';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    AuthComponent,
-    UsersComponent,
-    LoginComponent,
-    RegisterComponent,
-    ErrorMessageComponent,
-    PageNotFoundComponent,
-    HeaderComponent,
-    FormComponent,
-    CalendarComponent,
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    CalendarModule.forRoot({
-      provide: DateAdapter,
-      useFactory: adapterFactory,
-    }),
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true,
-    },
-  ],
-  bootstrap: [AppComponent],
-})
+@NgModule({ declarations: [
+        AppComponent,
+        AuthComponent,
+        UsersComponent,
+        LoginComponent,
+        RegisterComponent,
+        ErrorMessageComponent,
+        PageNotFoundComponent,
+        HeaderComponent,
+        FormComponent,
+        CalendarComponent,
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        CalendarModule.forRoot({
+            provide: DateAdapter,
+            useFactory: adapterFactory,
+        })], providers: [
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true,
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule {}
