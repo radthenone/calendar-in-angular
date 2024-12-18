@@ -1,3 +1,4 @@
+<app-header [isAuthenticated]="isAuthenticated" [user]="user"></app-header>
 <div class="container">
-  <router-outlet></router-outlet>
+  <app-main [isAuthenticated]="isAuthenticated"></app-main>
 </div>

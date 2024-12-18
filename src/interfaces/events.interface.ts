@@ -1,9 +1,10 @@
 export interface EventMode {
-  mode: 'add' | 'edit';
+  mode: 'add' | 'edit' | 'view';
 }
 
 export interface EventRecurrenceMode {
-  type: 'daily' | 'weekly' | 'monthly';
+  type: 'none' | 'daily' | 'weekly' | 'monthly';
+  repeatUntil?: Date | null;
 }
 
 export interface Event {

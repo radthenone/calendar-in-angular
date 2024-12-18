@@ -1,24 +1,38 @@
 <div class="calendar-container">
   <div class="calendar-header">
     <i class="bi bi-arrow-left-square-fill" (click)="previousMonth()"></i>
-    <h2>{{ currentMonth | titlecase }}</h2>
+    <h2>{{ currentMonth }}</h2>
     <i class="bi bi-arrow-right-square-fill" (click)="nextMonth()"></i>
   </div>
   <div class="calendar-weekdays">
-    <span *ngFor="let weekDay of weekNames">{{ weekDay | titlecase }}</span>
+    @for (weekDay of weekNames; track weekDay) {
+      <span>{{ weekDay }}</span>
+    }
   </div>
   <div class="calendar-grid">
-    <div
-      *ngFor="let day of calendar"
-      class="calendar-day"
-      [class.today]="day.isToday"
-      [class.past]="day.isPast"
-      [class.selected]="!day.isPast"
-      [class.future]="!day.isMonthDays && !day.isPast"
-      [class.month-days]="day.isMonthDays"
-      [class.has-events]="hasEvents(day)"
-    >
-      <span class="calendar-day-number">{{ day.date.getDate() }}</span>
-    </div>
+    @for (day of calendar; track day.date) {
+      <div
+        class="calendar-day"
+        [class.today]="day.isToday"
+        [class.past]="day.isPast"
+        [class.selected]="!day.isPast"
+        [class.future]="!day.isMonthDays && !day.isPast"
+        [class.month-days]="day.isMonthDays"
+      >
+        <div class="calendar-day-number">
+          {{ day.date | date: "dd.MM.yy" }}
+        </div>
+        <div class="calendar-event-content">
+          <p>Event 1</p>
+          <p>Event 2</p>
+          <p>Event 3</p>
+          <p>Event 4</p>
+          <p>Event 5</p>
+          <!--        <p>Event 6</p>-->
+          <!--        <p>Event 7</p>-->
+        </div>
+      </div>
+      <!--      [class.has-events]="hasEvents(day)"-->
+    }
   </div>
 </div>

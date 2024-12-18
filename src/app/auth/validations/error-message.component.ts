@@ -1,15 +1,17 @@
-import { Component, Input } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
-import { ValidationService } from './validation.service';
+import { Component, Input } from "@angular/core";
+import { AbstractControl, FormGroup } from "@angular/forms";
+import { ValidationService } from "./validation.service";
+import { NgStyle } from "@angular/common";
 
 @Component({
-    selector: 'error-message',
-    templateUrl: './error-message.component.html',
-    standalone: false
+  selector: "error-message",
+  templateUrl: "./error-message.component.html",
+  standalone: true,
+  imports: [NgStyle],
 })
 export class ErrorMessageComponent {
   // @ts-ignore
-  @Input('control') control: AbstractControl | FormGroup;
+  @Input("control") control: AbstractControl | FormGroup;
 
   get errorMessage(): string | null {
     if (this.control instanceof FormGroup && this.control.errors) {

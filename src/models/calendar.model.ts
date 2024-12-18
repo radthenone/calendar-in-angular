@@ -27,6 +27,11 @@ export class CalendarDay {
   }
 
   setIsToday(date: Date): boolean {
-    return date.toDateString() === new Date().toDateString();
+    const today = new Date();
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
   }
 }

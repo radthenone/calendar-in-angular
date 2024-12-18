@@ -1,14 +1,12 @@
 <div class="container">
-  <!--  <router-outlet></router-outlet>-->
   <div class="d-flex flex-column align-items-center">
     <button class="btn btn-primary" (click)="onSwitchMode()">
       Switch to {{ isLogin ? "Register" : "Login" }}
     </button>
   </div>
-  <div *ngIf="isLogin">
+  @if (isLogin && !isAuthenticated) {
     <app-login></app-login>
-  </div>
-  <div *ngIf="!isLogin">
+  } @else {
     <app-register></app-register>
-  </div>
+  }
 </div>
