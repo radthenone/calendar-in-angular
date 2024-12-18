@@ -1,19 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../auth.service';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, OnInit } from "@angular/core";
+import { AuthService } from "../auth.service";
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from "@angular/forms";
+import { Router, RouterLink } from "@angular/router";
 import {
   checkPasswords,
   EmailExistsValidator,
   UsernameExistsValidator,
-} from '../validations/validation.service';
-import { AuthResponse } from 'interfaces/auth.interface';
+} from "../validations/validation.service";
+import { AuthResponse } from "interfaces/auth.interface";
+import { ErrorMessageComponent } from "../validations/error-message.component";
 
 @Component({
-    selector: 'app-register',
-    templateUrl: './register.component.html',
-    styleUrls: ['./register.component.css'],
-    standalone: false
+  selector: "app-register",
+  templateUrl: "./register.component.html",
+  styleUrls: ["./register.component.css"],
+  imports: [FormsModule, ReactiveFormsModule, ErrorMessageComponent],
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
@@ -26,17 +33,17 @@ export class RegisterComponent implements OnInit {
     this.registerForm = this.formBuilder.group(
       {
         email: [
-          '',
+          "",
           [Validators.required, Validators.email],
           EmailExistsValidator.createValidator(this.authService),
         ],
         username: [
-          '',
+          "",
           [Validators.required],
           UsernameExistsValidator.createValidator(this.authService),
         ],
-        password: ['', [Validators.required, Validators.minLength(8)]],
-        confirmPassword: ['', [Validators.required, Validators.minLength(8)]],
+        password: ["", [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ["", [Validators.required, Validators.minLength(8)]],
       },
       {
         validators: [checkPasswords],
@@ -59,7 +66,7 @@ export class RegisterComponent implements OnInit {
     this.authService.register({ email, username, password }).subscribe({
       next: (response: AuthResponse) => {
         console.log(response);
-        this.router.navigate(['auth/login']);
+        this.router.navigate(["auth/login"]);
       },
       error: (error: Error) => {
         console.log(error);

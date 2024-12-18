@@ -1,20 +1,24 @@
-import { Component } from '@angular/core';
-import { AuthService } from '../auth.service';
+import { Component } from "@angular/core";
+import { AuthService } from "../auth.service";
 import {
   FormGroup,
   FormBuilder,
   Validators,
   FormControl,
-} from '@angular/forms';
-import { AuthResponse } from 'interfaces/auth.interface';
-import { EmailDoesNotExistsValidator } from '../validations/validation.service';
-import { Router } from '@angular/router';
+  FormsModule,
+  ReactiveFormsModule,
+} from "@angular/forms";
+import { AuthResponse } from "interfaces/auth.interface";
+import { EmailDoesNotExistsValidator } from "../validations/validation.service";
+import { Router, RouterLink } from "@angular/router";
+import { ErrorMessageComponent } from "../validations/error-message.component";
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css'],
-    standalone: false
+  selector: "app-login",
+  templateUrl: "./login.component.html",
+  styleUrls: ["./login.component.css"],
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, ErrorMessageComponent],
 })
 export class LoginComponent {
   loginForm: FormGroup;
@@ -28,11 +32,11 @@ export class LoginComponent {
   ) {
     this.loginForm = this.formBuilder.group({
       email: [
-        '',
+        "",
         [Validators.required, Validators.email],
         EmailDoesNotExistsValidator.createValidator(this.authService),
       ],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ["", [Validators.required, Validators.minLength(8)]],
     });
   }
 
@@ -50,7 +54,7 @@ export class LoginComponent {
           next: (response: AuthResponse) => {
             console.log(response);
             this.submitted = false;
-            this.router.navigate(['/']);
+            this.router.navigate(["/"]);
           },
           error: (error) => {
             this.errorMessageControl.setErrors({

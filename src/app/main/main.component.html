@@ -1,0 +1,5 @@
+@if (isAuthenticated) {
+  <app-calendar></app-calendar>
+} @else {
+  <app-auth [isAuthenticated]="isAuthenticated"></app-auth>
+}

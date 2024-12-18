@@ -11,9 +11,11 @@
           placeholder="Enter email"
           autocomplete="email"
         />
-        <div *ngIf="submitted && fields['email'].errors" class="text-danger">
-          <error-message [control]="fields['email']"></error-message>
-        </div>
+        @if (submitted && fields["email"].errors) {
+          <div class="text-danger">
+            <error-message [control]="fields['email']"></error-message>
+          </div>
+        }
       </div>
       <div class="form-group">
         <label for="username">Username</label>
@@ -25,9 +27,11 @@
           placeholder="Enter username"
           autocomplete="username"
         />
-        <div *ngIf="submitted && fields['username'].errors" class="text-danger">
-          <error-message [control]="fields['username']"></error-message>
-        </div>
+        @if (submitted && fields["username"].errors) {
+          <div class="text-danger">
+            <error-message [control]="fields['username']"></error-message>
+          </div>
+        }
       </div>
       <div class="form-group">
         <label for="password">Password</label>
@@ -39,9 +43,11 @@
           placeholder="Enter password"
           autocomplete="new-password"
         />
-        <div *ngIf="submitted && fields['password'].errors" class="text-danger">
-          <error-message [control]="fields['password']"></error-message>
-        </div>
+        @if (submitted && fields["password"].errors) {
+          <div class="text-danger">
+            <error-message [control]="fields['password']"></error-message>
+          </div>
+        }
       </div>
       <div class="form-group">
         <label for="confirmPassword">Confirm Password</label>
@@ -53,36 +59,24 @@
           placeholder="Confirm password"
           autocomplete="new-password"
         />
-        <div
-          *ngIf="submitted && fields['confirmPassword'].errors"
-          class="text-danger"
-        >
-          <error-message [control]="fields['confirmPassword']"></error-message>
+        @if (submitted && fields["confirmPassword"].errors) {
+          <div class="text-danger">
+            <error-message
+              [control]="fields['confirmPassword']"
+            ></error-message>
+          </div>
+        }
+      </div>
+      @if (
+        (submitted && registerForm.hasError("passwordsDontMatch")) ||
+        registerForm.hasError("serverError")
+      ) {
+        <div class="text-danger">
+          <error-message [control]="registerForm"></error-message>
         </div>
-      </div>
-      <div
-        *ngIf="submitted && registerForm.hasError('passwordsDontMatch')"
-        class="text-danger"
-      >
-        <error-message [control]="registerForm"></error-message>
-      </div>
+      }
 
-      <div
-        *ngIf="submitted && registerForm.hasError('serverError')"
-        class="text-danger"
-      >
-        <error-message [control]="registerForm"></error-message>
-      </div>
-
-      <button type="submit" class="btn btn-primary">Submit</button>
-
-      <button
-        type="button"
-        class="btn btn-primary"
-        [routerLink]="['/auth/login']"
-      >
-        Login
-      </button>
+      <button type="submit" class="btn btn-primary">Register</button>
     </form>
   </div>
 </div>

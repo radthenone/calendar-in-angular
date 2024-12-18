@@ -1,12 +1,14 @@
-<div *ngIf="errorMessage !== null" class="error-container">
-  <span
-    [ngStyle]="{
-      'background-color': 'red',
-      color: 'white',
-      'border-radius': '5px',
-      border: '4px solid red',
-    }"
-    class="error-text"
-    >{{ errorMessage }}</span
-  >
-</div>
+@if (errorMessage !== null) {
+  <div class="error-container">
+    <span
+      [ngStyle]="{
+        'background-color': 'red',
+        color: 'white',
+        'border-radius': '5px',
+        border: '4px solid red',
+      }"
+      class="error-text"
+      >{{ errorMessage }}</span
+    >
+  </div>
+}
