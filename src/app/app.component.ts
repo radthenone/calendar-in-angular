@@ -3,7 +3,6 @@ import { AuthService } from "./auth/auth.service";
 import { MainComponent } from "./main/main.component";
 import { HeaderComponent } from "./header/header.component";
 import { UserSubject } from "models/users.model";
-import { toSignal } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: "app-root",
@@ -13,14 +12,11 @@ import { toSignal } from "@angular/core/rxjs-interop";
 })
 export class AppComponent implements OnInit {
   user: Signal<UserSubject | null>;
-  isAuthenticated: boolean = false;
+  isLoggedIn: Signal<boolean>;
 
   constructor(private authService: AuthService) {
-    this.user = toSignal(this.authService.getUser(), { initialValue: null });
-
-    effect(() => {
-      this.isAuthenticated = this.user() !== null;
-    });
+    this.user = this.authService.user;
+    this.isLoggedIn = this.authService.isAuthenticated;
   }
 
   ngOnInit(): void {

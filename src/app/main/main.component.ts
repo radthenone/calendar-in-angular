@@ -2,12 +2,16 @@ import {
   booleanAttribute,
   Component,
   Input,
+  input,
   OnDestroy,
   OnInit,
+  effect,
+  Signal,
 } from "@angular/core";
 import { CalendarComponent } from "../calendar/calendar.component";
 import { RouterLink } from "@angular/router";
 import { AuthComponent } from "../auth/auth.component";
+import { AuthService } from "../auth/auth.service";
 
 @Component({
   selector: "app-main",
@@ -16,6 +20,11 @@ import { AuthComponent } from "../auth/auth.component";
   styleUrl: "./main.component.css",
 })
 export class MainComponent implements OnInit {
-  @Input() isAuthenticated: boolean = false;
+  isLoggedIn: Signal<boolean>;
+
+  constructor(private authService: AuthService) {
+    this.isLoggedIn = this.authService.isAuthenticated;
+  }
+
   ngOnInit() {}
 }

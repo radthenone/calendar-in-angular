@@ -1,5 +1,6 @@
 import {
   Component,
+  effect,
   Input,
   OnDestroy,
   OnInit,
@@ -18,13 +19,13 @@ import { RouterLink } from "@angular/router";
   imports: [RouterLink],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  @Input() isAuthenticated: boolean = false;
-  @Input() user: Signal<UserSubject | null> = signal(null);
+  user: Signal<UserSubject | null>;
+  isLoggedIn: Signal<boolean>;
 
-  // isAuthenticated: boolean = false;
-  // user: UserSubject | null = null;
-
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+    this.user = this.authService.user;
+    this.isLoggedIn = this.authService.isAuthenticated;
+  }
 
   ngOnInit() {}
 

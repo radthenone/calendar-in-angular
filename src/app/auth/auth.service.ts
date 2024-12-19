@@ -1,36 +1,48 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, mergeMap, Observable, tap } from 'rxjs';
-import { environment } from 'environment';
+import { effect, Injectable, Signal } from "@angular/core";
+import { BehaviorSubject, mergeMap, Observable, Subject, tap } from "rxjs";
+import { environment } from "environment";
 import {
   AuthResponse,
   ILogin,
   IRegister,
   TokenPayload,
-} from 'interfaces/auth.interface';
-import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
-import { User, UserSubject } from 'models/users.model';
-import { jwtDecode } from 'jwt-decode';
-import { Router } from '@angular/router';
+} from "interfaces/auth.interface";
+import { HttpClient } from "@angular/common/http";
+import { map } from "rxjs/operators";
+import { User, UserSubject } from "models/users.model";
+import { jwtDecode } from "jwt-decode";
+import { Router } from "@angular/router";
+import { toSignal } from "@angular/core/rxjs-interop";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class AuthService {
-  userSubject$: BehaviorSubject<UserSubject | null>;
+  private userSubject$ = new BehaviorSubject<UserSubject | null>(null);
+  private isAuthenticatedSubject$ = new BehaviorSubject<boolean>(false);
   private tokenExpirationTimer: any;
+
+  user: Signal<UserSubject | null> = toSignal(
+    this.userSubject$.asObservable(),
+    {
+      initialValue: null,
+    },
+  );
+  isAuthenticated: Signal<boolean> = toSignal(
+    this.isAuthenticatedSubject$.asObservable(),
+    { initialValue: false },
+  );
 
   constructor(
     private http: HttpClient,
     private router: Router,
   ) {
-    const authUser = this.accountUser;
-    this.userSubject$ = new BehaviorSubject<UserSubject | null>(authUser);
+    this.userSubject$.next(this.accountUser);
   }
 
   public get accountUser(): UserSubject | null {
-    const userString = localStorage.getItem('authUser');
-    console.log('userString', userString);
+    const userString = localStorage.getItem("authUser");
+    console.log("userString", userString);
     const userData = userString ? JSON.parse(userString) : null;
     if (!userData) {
       return null;
@@ -51,9 +63,10 @@ export class AuthService {
       token,
       expirationDate,
     );
-    localStorage.setItem('authUser', JSON.stringify(user));
+    localStorage.setItem("authUser", JSON.stringify(user));
     this.userSubject$.next(user);
-    console.log('userSubject$:', this.userSubject$.getValue());
+    this.isAuthenticatedSubject$.next(true);
+    console.log("userSubject$:", this.userSubject$.getValue());
   }
 
   public getUser(): Observable<UserSubject | null> {
@@ -62,6 +75,10 @@ export class AuthService {
 
   public getUserId(): Observable<string | null> {
     return this.getUser().pipe(map((user) => user?.id || null));
+  }
+
+  public getToken(): string | null {
+    return this.user()?.token || null;
   }
 
   checkEmail(email: string): Observable<boolean> {
@@ -112,7 +129,7 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.userSubject$.getValue();
+    return this.isAuthenticatedSubject$.value;
   }
 
   autoLogin(): void {
@@ -138,9 +155,10 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('authUser');
+    localStorage.removeItem("authUser");
     this.userSubject$.next(null);
-    this.router.navigate(['/auth/login']);
+    this.isAuthenticatedSubject$.next(false);
+    this.router.navigate(["/auth/login"]);
 
     if (this.tokenExpirationTimer) {
       clearTimeout(this.tokenExpirationTimer);
