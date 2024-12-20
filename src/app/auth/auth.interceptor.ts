@@ -19,12 +19,12 @@ export class AuthInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
-    const token = this.authService.getToken();
+    const user = this.authService.accountUser;
 
-    if (token) {
+    if (user && user.token) {
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${user.token}`,
         },
       });
     }
