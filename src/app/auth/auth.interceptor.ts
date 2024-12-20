@@ -8,23 +8,27 @@ import {
 import { AuthService } from "./auth.service";
 import { Injectable } from "@angular/core";
 import { Observable, catchError, throwError } from "rxjs";
+import { TokenService } from "./token.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private tokenService: TokenService,
+  ) {}
 
   intercept(
     request: HttpRequest<any>,
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
-    const token = this.authService.getToken();
+    const user = this.authService.accountUser;
 
-    if (token) {
+    if (user && user.token) {
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${user.token}`,
         },
       });
     }

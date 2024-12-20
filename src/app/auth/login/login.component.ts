@@ -52,7 +52,6 @@ export class LoginComponent {
       if (email && password) {
         this.authService.login({ email, password }).subscribe({
           next: (response: AuthResponse) => {
-            console.log(response);
             this.submitted = false;
             this.router.navigate(["/"]);
           },

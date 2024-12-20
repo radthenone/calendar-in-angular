@@ -1,5 +1,5 @@
-import { effect, Injectable, Signal } from "@angular/core";
-import { BehaviorSubject, mergeMap, Observable, Subject, tap } from "rxjs";
+import { Injectable, Signal } from "@angular/core";
+import { BehaviorSubject, mergeMap, Observable, tap } from "rxjs";
 import { environment } from "environment";
 import {
   AuthResponse,
@@ -10,9 +10,9 @@ import {
 import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
 import { User, UserSubject } from "models/users.model";
-import { jwtDecode } from "jwt-decode";
 import { Router } from "@angular/router";
 import { toSignal } from "@angular/core/rxjs-interop";
+import { TokenService } from "./token.service";
 
 @Injectable({
   providedIn: "root",
@@ -22,7 +22,7 @@ export class AuthService {
   private isAuthenticatedSubject$ = new BehaviorSubject<boolean>(false);
   private tokenExpirationTimer: any;
 
-  user: Signal<UserSubject | null> = toSignal(
+  getUser: Signal<UserSubject | null> = toSignal(
     this.userSubject$.asObservable(),
     {
       initialValue: null,
@@ -36,49 +36,42 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private tokenService: TokenService,
   ) {
-    this.userSubject$.next(this.accountUser);
+    this.initializeUser();
+  }
+
+  private initializeUser(): void {
+    const user: UserSubject | null = this.accountUser;
+    if (user) {
+      this.userSubject$.next(user);
+      this.isAuthenticatedSubject$.next(true);
+    } else {
+      this.userSubject$.next(null);
+      this.isAuthenticatedSubject$.next(false);
+    }
   }
 
   public get accountUser(): UserSubject | null {
-    const userString = localStorage.getItem("authUser");
-    console.log("userString", userString);
-    const userData = userString ? JSON.parse(userString) : null;
-    if (!userData) {
-      return null;
+    const token = this.tokenService.getToken();
+    if (token) {
+      return JSON.parse(token) as UserSubject;
     }
-    return new UserSubject(
-      userData.id,
-      userData.email,
-      userData._token,
-      new Date(userData._tokenExpirationDate),
-    );
+    return null;
   }
 
   private handleAuthentication(payload: TokenPayload, token: string): void {
-    const expirationDate = new Date(new Date().getTime() + payload.exp * 1000);
+    const expirationDate = new Date(payload.exp * 1000);
     const user = new UserSubject(
       payload.sub,
       payload.email,
       token,
       expirationDate,
     );
-    localStorage.setItem("authUser", JSON.stringify(user));
+    this.tokenService.setToken(JSON.stringify(user));
     this.userSubject$.next(user);
     this.isAuthenticatedSubject$.next(true);
-    console.log("userSubject$:", this.userSubject$.getValue());
-  }
-
-  public getUser(): Observable<UserSubject | null> {
-    return this.userSubject$.asObservable();
-  }
-
-  public getUserId(): Observable<string | null> {
-    return this.getUser().pipe(map((user) => user?.id || null));
-  }
-
-  public getToken(): string | null {
-    return this.user()?.token || null;
+    this.autoLogout(expirationDate.getTime() - new Date().getTime());
   }
 
   checkEmail(email: string): Observable<boolean> {
@@ -91,10 +84,6 @@ export class AuthService {
     return this.http
       .get<User[]>(`${environment.apiUrl}/users`)
       .pipe(map((users) => !!users.find((user) => user.username === username)));
-  }
-
-  decodeToken(token: string): TokenPayload {
-    return jwtDecode(token) as TokenPayload;
   }
 
   activateUser(userId: string): Observable<User> {
@@ -119,7 +108,7 @@ export class AuthService {
       })
       .pipe(
         tap((response) => {
-          const payload = this.decodeToken(response.accessToken);
+          const payload = this.tokenService.decodeToken(response.accessToken);
           this.handleAuthentication(payload, response.accessToken);
         }),
         mergeMap((response) => {
@@ -138,13 +127,17 @@ export class AuthService {
       return;
     }
     if (accountUser.token) {
-      const payload = this.decodeToken(accountUser.token);
+      const payload = this.tokenService.decodeToken(accountUser.token);
       const expirationDate = new Date(payload.exp * 1000);
       if (expirationDate > new Date()) {
         this.userSubject$.next(accountUser);
+        this.isAuthenticatedSubject$.next(true);
+        console.log("User restored:", accountUser);
       }
       const timeLeft = expirationDate.getTime() - new Date().getTime();
       this.autoLogout(timeLeft);
+    } else {
+      this.logout();
     }
   }
 
@@ -155,7 +148,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem("authUser");
+    this.tokenService.clearToken();
     this.userSubject$.next(null);
     this.isAuthenticatedSubject$.next(false);
     this.router.navigate(["/auth/login"]);

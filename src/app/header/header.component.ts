@@ -23,7 +23,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isLoggedIn: Signal<boolean>;
 
   constructor(private authService: AuthService) {
-    this.user = this.authService.user;
+    this.user = this.authService.getUser;
     this.isLoggedIn = this.authService.isAuthenticated;
   }
 
