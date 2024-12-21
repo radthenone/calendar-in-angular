@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="09c64c88-a2c7-450b-becb-eb123a77fb6b" name="Changes" comment="add" />
+    <list default="true" id="09c64c88-a2c7-450b-becb-eb123a77fb6b" name="Changes" comment="change path" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -252,7 +252,7 @@
       <workItem from="1734715443275" duration="3150000" />
       <workItem from="1734771197765" duration="352000" />
       <workItem from="1734771574444" duration="1670000" />
-      <workItem from="1734777198361" duration="359000" />
+      <workItem from="1734777198361" duration="688000" />
     </task>
     <task id="LOCAL-00001" summary="add gitignore">
       <option name="closed" value="true" />
@@ -398,7 +398,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734777297442</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="change path">
+      <option name="closed" value="true" />
+      <created>1734777860080</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1734777860080</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -414,7 +422,8 @@
     <MESSAGE value="change rxrj to signal to all user app" />
     <MESSAGE value="add date per day in calendar" />
     <MESSAGE value="add" />
-    <option name="LAST_COMMIT_MESSAGE" value="add" />
+    <MESSAGE value="change path" />
+    <option name="LAST_COMMIT_MESSAGE" value="change path" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
