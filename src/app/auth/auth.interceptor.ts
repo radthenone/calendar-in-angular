@@ -8,12 +8,16 @@ import {
 import { AuthService } from "./auth.service";
 import { Injectable } from "@angular/core";
 import { Observable, catchError, throwError } from "rxjs";
+import { TokenService } from "./token.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private tokenService: TokenService,
+  ) {}
 
   intercept(
     request: HttpRequest<any>,
