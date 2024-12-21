@@ -1,12 +1,4 @@
-import {
-  Component,
-  effect,
-  Input,
-  OnDestroy,
-  OnInit,
-  Signal,
-  signal,
-} from "@angular/core";
+import { Component, OnDestroy, OnInit, Signal } from "@angular/core";
 import { AuthService } from "../auth/auth.service";
 import { UserSubject } from "models/users.model";
 import { RouterLink } from "@angular/router";
