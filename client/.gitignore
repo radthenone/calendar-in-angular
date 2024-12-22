@@ -46,3 +46,4 @@ db.json
 backend.http
 .vscode
 src/app/**/**/**.spec.ts
+environment.ts
