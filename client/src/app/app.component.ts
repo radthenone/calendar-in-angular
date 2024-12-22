@@ -3,6 +3,7 @@ import { AuthService } from "./auth/auth.service";
 import { MainComponent } from "./main/main.component";
 import { HeaderComponent } from "./header/header.component";
 import { UserSubject } from "models/users.model";
+import { environment } from "environment";
 
 @Component({
   selector: "app-root",
@@ -17,6 +18,7 @@ export class AppComponent implements OnInit {
   constructor(private authService: AuthService) {
     this.user = this.authService.getUser;
     this.isLoggedIn = this.authService.isAuthenticated;
+    console.log(environment.secretKey);
   }
 
   ngOnInit(): void {

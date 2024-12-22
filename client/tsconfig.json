@@ -26,7 +26,14 @@
     "paths": {
       "models/*": ["src/models/*"],
       "interfaces/*": ["src/interfaces/*"],
-    }
+    },
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictBindCallApply": true,
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
