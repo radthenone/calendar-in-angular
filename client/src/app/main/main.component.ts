@@ -18,6 +18,7 @@ import { AuthService } from "../auth/auth.service";
   imports: [CalendarComponent, AuthComponent],
   templateUrl: "./main.component.html",
   styleUrl: "./main.component.css",
+  standalone: true
 })
 export class MainComponent implements OnInit {
   isLoggedIn: Signal<boolean>;
