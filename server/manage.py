@@ -1,18 +1,23 @@
-#!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
 import os
 import sys
-from config.paths import PROJECT_DIR
+
 from dotenv import load_dotenv
 
+from config.paths import PROJECT_DIR
 
 load_dotenv(
     dotenv_path=PROJECT_DIR / ".env.local",
 )
 
+BACKEND_URL = os.getenv("BACKEND_URL", "localhost:8000")
+if "http://" in BACKEND_URL:
+    BACKEND_URL = BACKEND_URL.replace("http://", "")
+HOST, PORT = BACKEND_URL.split(":")
+
+
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -21,15 +26,11 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    if sys.argv[1] == 'runserver':
-        backend_url = os.getenv('BACKEND_URL', 'localhost:8000')
-        if 'http://' in backend_url:
-            backend_url = backend_url.replace('http://', '')
-        host, port = backend_url.split(':')
-        sys.argv[2:3] = [f"{host}:{port}"]
+    if sys.argv[1] == "runserver":
+        sys.argv[2:3] = [f"{HOST}:{PORT}"]
 
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
