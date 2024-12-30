@@ -4,12 +4,8 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
 
-from apps.users.routers import users_router
+from apps.auth.routers import auth_router
 
 urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
@@ -24,7 +20,5 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
-    path("api/auth/", include(users_router.urls)),
-    # path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    # path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/auth/", include(auth_router.urls), name="api-auth"),
 ]
