@@ -1,9 +1,13 @@
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
 from apps.auth.views import LoginViewSet, RegisterViewSet, TokenRefreshViewSet
 
-auth_router = DefaultRouter()
-
-auth_router.register("register", RegisterViewSet, basename="register")
-auth_router.register("login", LoginViewSet, basename="login")
-auth_router.register("refresh", TokenRefreshViewSet, basename="refresh-token")
+auth_router = [
+    path("register/", RegisterViewSet.as_view({"post": "create"}), name="register"),
+    path("login/", LoginViewSet.as_view({"post": "create"}), name="login"),
+    path(
+        "refresh-token/",
+        TokenRefreshViewSet.as_view({"post": "create"}),
+        name="refresh-token",
+    ),
+]

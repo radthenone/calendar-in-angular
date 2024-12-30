@@ -12,7 +12,7 @@ from apps.users.services import UserService
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    rewrite_password = serializers.CharField()
+    rewrite_password = serializers.CharField(write_only=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,7 +31,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {
             "password": {"write_only": True},
-            "rewrite_password": {"write_only": True},
         }
 
     def validate(self, attrs):
@@ -48,11 +47,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        rewrite_password = validated_data.pop("rewrite_password")
+        validated_data.pop("rewrite_password")
         self.service.create_user(
             **validated_data,
         )
-        validated_data["rewrite_password"] = rewrite_password
 
         return validated_data
 

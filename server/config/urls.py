@@ -6,6 +6,7 @@ from drf_spectacular.views import (
 )
 
 from apps.auth.routers import auth_router
+from apps.users.routers import users_router
 
 urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
@@ -20,5 +21,6 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
-    path("api/auth/", include(auth_router.urls), name="api-auth"),
+    path("api/auth/", include(auth_router), name="api-auth"),
+    path("api/users/", include(users_router), name="api-users"),
 ]

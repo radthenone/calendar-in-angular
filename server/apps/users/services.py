@@ -1,6 +1,6 @@
 from typing import Optional
 
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password, make_password
 
 from apps.users.models import User
 
@@ -17,6 +17,12 @@ class UserService:
 
     def get_user_by_email(self, email: str) -> Optional[User]:
         return self.model.objects.filter(email=email).first()
+
+    def check_password(self, user_id: int, password: str) -> bool:
+        user = self.get_user(user_id=user_id)
+        if not user:
+            return False
+        return check_password(password, user.password)
 
     def create_user(
         self,
@@ -45,11 +51,11 @@ class UserService:
     def update_user(self, user_id: int, **kwargs):
         return self.model.objects.filter(id=user_id).update(**kwargs)
 
-    def update_password(self, user_id: int, new_password: str):
-        new_hashed_password = make_password(new_password)
-        return self.model.objects.filter(id=user_id).update(
-            password=new_hashed_password
-        )
+    @staticmethod
+    def update_password(user: User, new_password: str) -> User:
+        user.set_password(new_password)
+        user.save()
+        return user
 
     def delete_user(self, user_id: int):
         return self.model.objects.filter(id=user_id).delete()
