@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from apps.users.serializers import (
     LoginSerializer,
-    # RefreshTokenSerializer,
+    RefreshTokenSerializer,
     RegisterSerializer,
 )
 from apps.users.services import UserService
@@ -62,33 +62,38 @@ class LoginViewSet(viewsets.ViewSet):
             access_token = serializer.validated_data["access_token"]
             refresh_token = serializer.validated_data["refresh_token"]
             return Response(
-                {"access": str(access_token), "refresh": str(refresh_token)},
+                {
+                    "access": str(access_token),
+                    "refresh": str(refresh_token),
+                },
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-#
-# class TokenRefreshViewSet(viewsets.ViewSet):
-#     serializer_class = RefreshTokenSerializer
-#     permission_classes = [AllowAny]
-#
-#     @extend_schema(
-#         request=RefreshTokenSerializer,
-#         examples=[
-#             OpenApiExample(
-#                 "Refresh token example",
-#                 value={"refresh": "exampleRefreshToken123"},
-#             )
-#         ],
-#     )
-#     def create(self, request):
-#         serializer = self.serializer_class(data=request.data)
-#         if serializer.is_valid(raise_exception=True):
-#             refresh_token: RefreshToken = serializer.validated_data["refresh"]
-#             access_token = refresh_token.access_token
-#             return Response(
-#                 {"access": str(access_token), "refresh": str(refresh_token)},
-#                 status=status.HTTP_200_OK,
-#             )
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class TokenRefreshViewSet(viewsets.ViewSet):
+    serializer_class = RefreshTokenSerializer
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        request=RefreshTokenSerializer,
+        examples=[
+            OpenApiExample(
+                "Refresh token example",
+                value={"refresh": "exampleRefreshToken123"},
+            )
+        ],
+    )
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)  # noqa
+        if serializer.is_valid(raise_exception=True):
+            access_token = serializer.validated_data["access_token"]
+            refresh_token = serializer.validated_data["refresh_token"]
+            return Response(
+                {
+                    "access": str(access_token),
+                    "refresh": str(refresh_token),
+                },
+                status=status.HTTP_200_OK,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

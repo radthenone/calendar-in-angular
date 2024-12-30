@@ -19,6 +19,9 @@ class UserService:
     def get_user_by_email(self, email: str) -> Optional[User]:
         return self.model.objects.filter(email=email).first()
 
+    def get_user_by_data(self, user_id: int, email: str) -> Optional[User]:
+        return self.model.objects.filter(id=user_id, email=email).first()
+
     def create_access_token(self, user: User) -> AccessToken:  # noqa
         return AccessToken.for_user(user)
 
