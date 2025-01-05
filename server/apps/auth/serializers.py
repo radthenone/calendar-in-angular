@@ -2,6 +2,7 @@ from typing import Optional
 
 import jwt
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
@@ -106,6 +107,8 @@ class LoginSerializer(serializers.Serializer):
         user = self.auth_service.authenticate_user(email=email, password=password)
         if not user:
             raise serializers.ValidationError("Wrong credentials")
+
+        self.auth_service.last_login_update(user=user)
 
         refresh_token = TokenSerializer.get_refresh_token(user)
         access_token = TokenSerializer.get_access_token(user)

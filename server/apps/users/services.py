@@ -12,6 +12,11 @@ class UserService:
     def get_all_users(self):
         return self.model.objects.all()
 
+    def get_all_users_filter_by_last_login(self):
+        return self.model.objects.filter(last_login__isnull=False).order_by(
+            "-last_login"
+        )
+
     def get_user(self, user_id: int) -> User:
         return self.model.objects.get(id=user_id)
 

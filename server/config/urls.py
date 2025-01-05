@@ -6,6 +6,7 @@ from drf_spectacular.views import (
 )
 
 from apps.auth.routers import auth_router
+from apps.events.routers import events_router
 from apps.users.routers import users_router
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     ),
     path("api/auth/", include(auth_router), name="api-auth"),
     path("api/users/", include(users_router), name="api-users"),
+    path("api/events/", include(events_router), name="api-events"),
 ]

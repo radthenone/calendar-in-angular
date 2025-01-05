@@ -1,3 +1,4 @@
+from django.utils import timezone
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
@@ -8,6 +9,7 @@ from apps.auth.serializers import (
     RefreshTokenSerializer,
     RegisterSerializer,
 )
+from apps.auth.services import AuthService
 from apps.users.services import UserService
 
 
@@ -41,6 +43,7 @@ class RegisterViewSet(viewsets.ViewSet):
 
 class LoginViewSet(viewsets.ViewSet):
     service = UserService()
+    auth_service = AuthService()
     queryset = service.get_all_users()
     serializer_class = LoginSerializer
     permission_classes = [AllowAny]

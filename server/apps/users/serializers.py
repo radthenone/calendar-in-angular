@@ -7,6 +7,25 @@ from apps.users.models import User
 from apps.users.services import UserService
 
 
+class UserSerializer(serializers.ModelSerializer):
+    last_login_date = serializers.DateTimeField(format="%Y-%m-%d", source="last_login")
+    last_login_time = serializers.DateTimeField(format="%H:%M:%S", source="last_login")
+
+    class Meta:
+        model = User
+        fields = [
+            "email",
+            "last_login_date",
+            "last_login_time",
+        ]
+
+        read_only_fields = [
+            "id",
+            "last_login_date",
+            "last_login_time",
+        ]
+
+
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True, source="password")
     new_password = serializers.CharField(required=True)

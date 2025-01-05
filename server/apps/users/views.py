@@ -6,8 +6,24 @@ from rest_framework.views import APIView
 
 from apps.users.serializers import (
     ChangePasswordSerializer,
+    UserSerializer,
 )
 from apps.users.services import UserService
+
+
+class UserListViewSet(generics.GenericAPIView, mixins.ListModelMixin):
+    permission_classes = [AllowAny]
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return UserService().get_all_users_filter_by_last_login()
+
+    @extend_schema(
+        tags=["users"],
+        request=UserSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
 
 class ChangePasswordViewSet(generics.GenericAPIView, mixins.UpdateModelMixin):

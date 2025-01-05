@@ -2,6 +2,7 @@ from typing import Optional
 
 import jwt
 from django.conf import settings
+from django.utils import timezone
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from apps.users.models import User
@@ -23,6 +24,11 @@ class AuthService:
             if user.is_active:
                 return user
         return None
+
+    @staticmethod
+    def last_login_update(user: User):
+        user.last_login = timezone.now()
+        user.save()
 
     @staticmethod
     def decode_token(token: AccessToken | RefreshToken) -> Optional[dict[str, any]]:
