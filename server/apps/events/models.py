@@ -18,13 +18,21 @@ class Event(models.Model):
         related_name="events",
     )
 
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     description = models.TextField(max_length=1000)
     recurring_type = models.CharField(
         max_length=50,
         choices=RecurringType.choices(),
         default=RecurringType.DAILY,
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "name"],
+                name="unique_event_name_per_user",
+            )
+        ]
 
     def __str__(self):
         return self.name
