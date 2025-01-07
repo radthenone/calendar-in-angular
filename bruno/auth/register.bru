@@ -1,0 +1,35 @@
+meta {
+  name: register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{backendUrl}}/{{version}}/auth/register/
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const { faker } = require('@faker-js/faker');
+  
+  function createRandomUser() {
+    const password = faker.internet.password()
+    return {
+      email: faker.internet.email(),
+      password: password,
+      rewrite_password: password
+    };
+  }
+  
+  const newUser = createRandomUser()
+  
+  console.log(newUser)
+  
+  bru.setVar("newUser", createRandomUser())
+  req.setBody(bru.getVar("newUser"))
+}
+
+script:post-response {
+  console.log(res.getBody())
+}

@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
-from apps.users.managers import UserManager
+from apps.users.managers import AuthManager, UserManager
 
 
 class User(AbstractUser):
@@ -18,6 +18,7 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     objects = UserManager()
+    auth = AuthManager()
 
     def __str__(self):
         return self.email

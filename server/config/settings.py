@@ -169,6 +169,10 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    "NON_FIELD_ERRORS_KEY": "errors",
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
+    "DEFAULT_VERSION": os.getenv("VERSION"),
+    "ALLOWED_VERSIONS": ["v1", "v2"],
 }
 
 SPECTACULAR_SETTINGS = {

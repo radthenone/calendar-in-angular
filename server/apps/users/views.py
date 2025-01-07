@@ -1,22 +1,21 @@
 from drf_spectacular.utils import OpenApiExample, extend_schema
-from rest_framework import generics, mixins, status, viewsets
+from rest_framework import generics, mixins, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
+from apps.users.models import User
 from apps.users.serializers import (
     ChangePasswordSerializer,
     UserSerializer,
 )
-from apps.users.services import UserService
 
 
-class UserListViewSet(generics.GenericAPIView, mixins.ListModelMixin):
+class UserListView(generics.GenericAPIView, mixins.ListModelMixin):
     permission_classes = [AllowAny]
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        return UserService().get_all_users_filter_by_last_login()
+        return User.objects.get_all_users_filter_by_last_login()
 
     @extend_schema(
         tags=["users"],
@@ -26,15 +25,12 @@ class UserListViewSet(generics.GenericAPIView, mixins.ListModelMixin):
         return self.list(request, *args, **kwargs)
 
 
-class ChangePasswordViewSet(generics.GenericAPIView, mixins.UpdateModelMixin):
+class ChangePasswordView(generics.GenericAPIView, mixins.UpdateModelMixin):
     permission_classes = [IsAuthenticated]
     serializer_class = ChangePasswordSerializer
 
-    def get_queryset(self):
-        return UserService().get_all_users()
-
     def get_object(self):
-        return self.request.user
+        return User.objects.get_user_by_id(user_id=self.request.user.id)
 
     @extend_schema(
         tags=["users"],

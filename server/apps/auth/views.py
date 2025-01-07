@@ -1,6 +1,5 @@
-from django.utils import timezone
 from drf_spectacular.utils import OpenApiExample, extend_schema
-from rest_framework import status, viewsets
+from rest_framework import generics, mixins, status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -9,13 +8,9 @@ from apps.auth.serializers import (
     RefreshTokenSerializer,
     RegisterSerializer,
 )
-from apps.auth.services import AuthService
-from apps.users.services import UserService
 
 
-class RegisterViewSet(viewsets.ViewSet):
-    service = UserService()
-    queryset = service.get_all_users()
+class RegisterView(mixins.CreateModelMixin, generics.GenericAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
@@ -33,19 +28,26 @@ class RegisterViewSet(viewsets.ViewSet):
             )
         ],
     )
-    def create(self, request):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                data={
+                    "detail": "User created successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginViewSet(viewsets.ViewSet):
-    service = UserService()
-    auth_service = AuthService()
-    queryset = service.get_all_users()
     serializer_class = LoginSerializer
+
     permission_classes = [AllowAny]
 
     @extend_schema(
@@ -61,13 +63,16 @@ class LoginViewSet(viewsets.ViewSet):
             )
         ],
     )
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)  # noqa
         if serializer.is_valid(raise_exception=True):
             access_token = serializer.validated_data["access_token"]
             refresh_token = serializer.validated_data["refresh_token"]
             return Response(
-                {
+                data={
+                    "detail": "User logged in successfully",
+                },
+                headers={
                     "access": str(access_token),
                     "refresh": str(refresh_token),
                 },
@@ -78,6 +83,7 @@ class LoginViewSet(viewsets.ViewSet):
 
 class TokenRefreshViewSet(viewsets.ViewSet):
     serializer_class = RefreshTokenSerializer
+
     permission_classes = [AllowAny]
 
     @extend_schema(
@@ -90,13 +96,16 @@ class TokenRefreshViewSet(viewsets.ViewSet):
             )
         ],
     )
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)  # noqa
         if serializer.is_valid(raise_exception=True):
             access_token = serializer.validated_data["access_token"]
             refresh_token = serializer.validated_data["refresh_token"]
             return Response(
-                {
+                data={
+                    "detail": "Token refreshed successfully",
+                },
+                headers={
                     "access": str(access_token),
                     "refresh": str(refresh_token),
                 },

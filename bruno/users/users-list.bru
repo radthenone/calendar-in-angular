@@ -1,0 +1,11 @@
+meta {
+  name: users-list
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{backendUrl}}/{{version}}/users/
+  body: none
+  auth: none
+}

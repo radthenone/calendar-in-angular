@@ -1,0 +1,27 @@
+meta {
+  name: refresh-token
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{backendUrl}}/{{version}}/auth/refresh-token/
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  let refreshToken = bru.getVar("refresh_token")
+  
+  req.setBody({
+    refresh: refreshToken
+  })
+  
+  console.log(req.body)
+}
+
+script:post-response {
+  console.log(res.body)
+  bru.setVar("access_token", res.headers.access);
+  bru.setVar("refresh_token", res.headers.refresh);
+}

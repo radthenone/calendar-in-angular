@@ -5,9 +5,10 @@ from apps.events.views import (
     EventDeleteView,
     EventDetailView,
     EventListView,
+    EventUpdateView,
 )
 
-events_router = [
+urlpatterns = [
     path(
         "list/",
         EventListView.as_view(),
@@ -19,14 +20,19 @@ events_router = [
         name="event-create",
     ),
     path(
-        "<str:name>/",
-        EventDetailView.as_view(),
-        name="event-detail",
+        "<str:name>/update/",
+        EventUpdateView.as_view(),
+        name="event-update",
     ),
     path(
-        "<int:day>/<int:month>/<int:year>/",
+        "by-name/<str:name>/",
         EventDetailView.as_view(),
-        name="event-detail",
+        name="event-detail-by-name",
+    ),
+    path(
+        "by-date/<int:day>/<int:month>/<int:year>/",
+        EventDetailView.as_view(),
+        name="event-detail-by-date",
     ),
     path(
         "<str:name>/delete/",

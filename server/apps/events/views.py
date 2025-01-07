@@ -56,7 +56,6 @@ class EventListView(generics.ListAPIView):
 
 class EventDetailView(generics.GenericAPIView):
     serializer_class = EventSerializer
-
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
@@ -83,6 +82,10 @@ class EventDetailView(generics.GenericAPIView):
         tags=["events"],
         request=None,
         responses=EventSerializer,
+        description=(
+            "Retrieve an event by name or date. If 'name' is provided, it will retrieve "
+            "by name. If 'day', 'month', and 'year' are provided, it will retrieve by date."
+        ),
     )
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -90,7 +93,34 @@ class EventDetailView(generics.GenericAPIView):
         return Response(serializer.data)
 
 
+class EventUpdateView(generics.UpdateAPIView):
+    serializer_class = EventCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        event_service = EventService(user=self.request.user)
+        event = event_service.get_current_event_by_name(
+            current_name=self.kwargs["name"]
+        )
+        if not event:
+            raise NotFound("Event not found.")
+        return event
+
+    @extend_schema(
+        tags=["events"],
+    )
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    @extend_schema(
+        tags=["events"],
+    )
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+
 class EventDeleteView(generics.DestroyAPIView):
+    serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):

@@ -16,7 +16,13 @@ class EventService:
         self.date_model = EventDate
 
     def get_events(self):
-        return self.model.objects.filter(user=self.user).prefetch_related("dates").all()
+        if self.user.is_authenticated:
+            return (
+                self.model.objects.filter(user=self.user)
+                .prefetch_related("dates")
+                .all()
+            )
+        return self.model.objects.none()
 
     def get_current_event_by_date(
         self,
@@ -116,3 +122,78 @@ class EventService:
             (datetime(year, month + 1, 1) - timedelta(days=1)).day,
         )
         return date(year, month, day)
+
+    def update_event_with_dates(
+        self,
+        instance: Event,
+        name: str = None,
+        description: str = None,
+        recurring_type: RecurringType = None,
+        start_date: date = None,
+        start_time: time = None,
+        end_date: date = None,
+        end_time: time = None,
+    ):
+        updated_fields = {}
+
+        # Zaktualizowanie pól Event
+        if name:
+            updated_fields["name"] = name
+        if description:
+            updated_fields["description"] = description
+        if recurring_type:
+            updated_fields["recurring_type"] = recurring_type
+
+        # Pobranie aktualnych dat z instancji Event
+        current_start_datetime = instance.dates.first().start_datetime
+        current_end_datetime = instance.dates.last().end_datetime
+
+        # Sprawdzamy, czy dostarczono start_date lub start_time
+        if start_date or start_time:
+            new_start_datetime = make_aware(
+                datetime.combine(
+                    start_date or current_start_datetime.date(),
+                    start_time or current_start_datetime.time(),
+                ),
+                timezone=get_current_timezone(),
+            )
+            updated_fields["dates__start_datetime"] = new_start_datetime
+        else:
+            # Jeśli nie zmienia się start_datetime, używamy wartości z instancji
+            new_start_datetime = current_start_datetime
+
+        # Sprawdzamy, czy dostarczono end_date lub end_time
+        if end_date or end_time:
+            new_end_datetime = make_aware(
+                datetime.combine(
+                    end_date or current_end_datetime.date(),
+                    end_time or current_end_datetime.time(),
+                ),
+                timezone=get_current_timezone(),
+            )
+            updated_fields["dates__end_datetime"] = new_end_datetime
+        else:
+            # Jeśli nie zmienia się end_datetime, używamy wartości z instancji
+            new_end_datetime = current_end_datetime
+
+        # Sprawdzamy, czy start datetime jest wcześniejsze niż end datetime
+        if new_start_datetime >= new_end_datetime:
+            raise ValueError("Start datetime should be earlier than end datetime.")
+
+        # Jeśli daty zostały zmienione, aktualizujemy EventDate
+        if (
+            "dates__start_datetime" in updated_fields
+            or "dates__end_datetime" in updated_fields
+        ):
+            self.date_model.objects.bulk_update(
+                instance.dates.all(),
+                fields=[
+                    "start_datetime",
+                    "end_datetime",
+                ],  # Tylko pola, które się zmieniły
+            )
+
+        # Zaktualizowanie samego Event
+        instance.save(update_fields=updated_fields.keys())
+
+        return instance

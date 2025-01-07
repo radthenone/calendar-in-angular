@@ -1,10 +1,8 @@
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from apps.users.models import User
-from apps.users.services import UserService
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,10 +37,6 @@ class ChangePasswordSerializer(serializers.Serializer):
             "rewrite_new_password",
         ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.service = UserService()
-
     def validate(self, attrs):
         if attrs.get("new_password") != attrs.get("rewrite_new_password"):
             raise serializers.ValidationError("Passwords do not match")
@@ -55,13 +49,13 @@ class ChangePasswordSerializer(serializers.Serializer):
     def validate_new_password(self, value):  # noqa
         try:
             validate_password(value)
-        except DjangoValidationError as e:
-            raise serializers.ValidationError(list(e.messages))
+        except DjangoValidationError as error:
+            raise serializers.ValidationError(list(error.messages))
         return value
 
     def update(self, instance, validated_data):
-        instance = self.service.update_password(
-            user=instance,
+        instance = User.objects.update_password(
+            user_id=instance.id,
             new_password=validated_data.get("new_password"),
         )
         return instance
