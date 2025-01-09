@@ -16,21 +16,36 @@ headers {
 }
 
 script:pre-request {
-  let LoginUser = {
-    email: bru.getVar("newUser")?.email || "example@example.com",
-    password: bru.getVar("newUser")?.password || "examplePassword1234"
+  let oldUser = bru.getVar("newUser")
+  let loginUser = {
+    email: oldUser?.email || "example@example.com",
+    password: oldUser?.password || "examplePassword1234"
   };
   
-  console.log(req.body)
-  console.log("version:", req.version)
+  const newUser = {
+    email: loginUser.email,
+    password: loginUser.password,
+    rewrite_password: loginUser.password
+  }
   
-  bru.setVar("LoginUser", LoginUser)
+  bru.setVar("newUser", newUser)
   
-  req.setBody(LoginUser)
+  req.setBody(loginUser)
 }
 
 script:post-response {
-  console.log(res.body)
+  function decodeJwt(token) {
+      return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+  }
+  
+  const token = res.headers.access.trim(); 
+  
+  const decoded = decodeJwt(token);
+  console.log(decoded)
+  
+  let newUser = bru.getVar("newUser")
+  newUser.pk = decoded.user_id
+  bru.setVar("newUser", newUser)
   bru.setVar("access_token", res.headers.access);
   bru.setVar("refresh_token", res.headers.refresh);
 }

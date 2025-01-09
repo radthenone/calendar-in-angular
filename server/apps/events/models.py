@@ -12,18 +12,18 @@ class Event(models.Model):
         primary_key=True,
         default=uuid.uuid4,
     )
-    user = models.ForeignKey(
-        "users.User",
-        on_delete=models.CASCADE,
-        related_name="events",
-    )
-
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=1000)
     recurring_type = models.CharField(
         max_length=50,
         choices=RecurringType.choices(),
         default=RecurringType.DAILY,
+    )
+
+    user = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="events",
     )
 
     class Meta:

@@ -1,0 +1,25 @@
+meta {
+  name: delete-user
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{backendUrl}}/{{version}}/users/:pk/
+  body: none
+  auth: bearer
+}
+
+params:path {
+  pk: {{newUser}}.pk
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+script:post-response {
+  bru.deleteVar("newUser")
+  bru.deleteVar("access_token")
+  bru.deleteVar("refresh_token")
+}

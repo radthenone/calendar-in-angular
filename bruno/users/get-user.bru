@@ -1,0 +1,19 @@
+meta {
+  name: get-user
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{backendUrl}}/{{version}}/users/:pk/
+  body: none
+  auth: bearer
+}
+
+params:path {
+  pk: {{newUser}}.pk
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

@@ -26,8 +26,8 @@ script:pre-request {
   
   console.log(newUser)
   
-  bru.setVar("newUser", createRandomUser())
-  req.setBody(bru.getVar("newUser"))
+  bru.setVar("newUser", newUser)
+  req.setBody(newUser)
 }
 
 script:post-response {

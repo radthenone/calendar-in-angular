@@ -1,0 +1,39 @@
+meta {
+  name: patch-user
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{backendUrl}}/{{version}}/users/:pk/
+  body: none
+  auth: bearer
+}
+
+params:path {
+  pk: {{newUser}}.pk
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+script:pre-request {
+  const { faker } = require('@faker-js/faker');
+  
+  function createNewUser() {
+    return {
+      first_name: faker.person.firstName(),
+      last_name: faker.person.lastName()
+    };
+  }
+  
+  let patchNewUser = createNewUser()
+  
+  req.setBody(patchNewUser)
+  console.log(req.body)
+}
+
+script:post-response {
+  console.log(res.body)
+}

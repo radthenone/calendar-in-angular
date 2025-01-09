@@ -6,6 +6,41 @@ from apps.users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    fullname = serializers.SerializerMethodField(
+        method_name="get_full_name",
+        read_only=True,
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "fullname",
+        ]
+        extra_kwargs = {
+            "email": {"required": False},
+            "first_name": {"required": False, "write_only": True},
+            "last_name": {"required": False, "write_only": True},
+        }
+
+    @staticmethod
+    def get_full_name(obj):
+        if not obj.first_name and not obj.last_name:
+            return ""
+        return f"{obj.first_name} {obj.last_name}"
+
+    def update(self, instance, validated_data):
+        return User.objects.update_user(
+            user_id=instance.id,
+            email=validated_data.get("email", instance.email),
+            first_name=validated_data.get("first_name", instance.first_name),
+            last_name=validated_data.get("last_name", instance.last_name),
+        )
+
+
+class UserListSerializer(serializers.ModelSerializer):
     last_login_date = serializers.DateTimeField(format="%Y-%m-%d", source="last_login")
     last_login_time = serializers.DateTimeField(format="%H:%M:%S", source="last_login")
 
