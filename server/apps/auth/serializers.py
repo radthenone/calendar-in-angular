@@ -1,6 +1,6 @@
 from typing import Optional
 
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
@@ -58,12 +58,12 @@ class TokenSerializer(TokenObtainPairSerializer):
         return token
 
     @classmethod
-    def get_refresh_token(cls, user) -> RefreshToken:
+    def get_refresh_token(cls, user: "User") -> RefreshToken:
         refresh_token: RefreshToken = cls.get_token(user)  # type: ignore
         return refresh_token
 
     @classmethod
-    def get_access_token(cls, user) -> AccessToken:
+    def get_access_token(cls, user: "User") -> AccessToken:
         access_token: AccessToken = cls.get_token(user).access_token  # type: ignore
         return access_token
 
@@ -82,9 +82,12 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     @staticmethod
-    def validate_email(email):
+    def validate_email(email: str) -> str:
         if not User.objects.get_user_by_email(email=email):
-            raise serializers.ValidationError("User with this email does not exist")
+            raise serializers.ValidationError(
+                detail="User with this email does not exist",
+                code=status.HTTP_404_NOT_FOUND,
+            )
         return email
 
     def validate(self, attrs):
@@ -92,15 +95,15 @@ class LoginSerializer(serializers.Serializer):
         password = attrs.get("password")
         user = User.auth.authenticate_user(email=email, password=password)
         if not user:
-            raise serializers.ValidationError("Wrong credentials")
+            raise serializers.ValidationError(
+                detail="Invalid credentials",
+                code=status.HTTP_400_BAD_REQUEST,
+            )
 
         User.objects.last_login_update(user_id=user.id)
 
-        refresh_token = TokenSerializer.get_refresh_token(user)
-        access_token = TokenSerializer.get_access_token(user)
-
-        attrs["access_token"] = access_token
-        attrs["refresh_token"] = refresh_token
+        attrs["access_token"] = TokenSerializer.get_refresh_token(user)
+        attrs["refresh_token"] = TokenSerializer.get_access_token(user)
 
         return attrs
 
@@ -111,17 +114,21 @@ class RefreshTokenSerializer(serializers.Serializer):
     def validate(self, attrs):  # noqa
         payload = TokenSerializer.decode_token(attrs.get("refresh"))
         if payload is None:
-            raise serializers.ValidationError("Invalid refresh token")
+            raise serializers.ValidationError(
+                detail="Invalid refresh token",
+                code=status.HTTP_400_BAD_REQUEST,
+            )
         user = User.objects.get_user_by_id_and_email(
             user_id=payload.get("user_id"),
             email=payload.get("email"),
         )
         if not user:
-            raise serializers.ValidationError("Invalid refresh token")
-        refresh_token = TokenSerializer.get_refresh_token(user)
-        access_token = TokenSerializer.get_access_token(user)
+            raise serializers.ValidationError(
+                detail="User not found",
+                code=status.HTTP_404_NOT_FOUND,
+            )
 
-        attrs["access_token"] = access_token
-        attrs["refresh_token"] = refresh_token
+        attrs["access_token"] = TokenSerializer.get_refresh_token(user)
+        attrs["refresh_token"] = TokenSerializer.get_access_token(user)
 
         return attrs

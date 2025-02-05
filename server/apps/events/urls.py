@@ -2,15 +2,13 @@ from django.urls import path
 
 from apps.events.views import (
     EventCreateView,
-    EventDeleteView,
     EventDetailView,
     EventListView,
-    EventUpdateView,
 )
 
 urlpatterns = [
     path(
-        "list/",
+        "",
         EventListView.as_view(),
         name="events-list",
     ),
@@ -20,23 +18,28 @@ urlpatterns = [
         name="event-create",
     ),
     path(
-        "<str:name>/update/",
-        EventUpdateView.as_view(),
+        "<str:event_id>/",
+        EventDetailView.as_view(),
+        name="event-detail",
+    ),
+    path(
+        "<str:event_id>/",
+        EventDetailView.as_view(),
         name="event-update",
     ),
+    # path(
+    #     "by-name/<str:name>/",
+    #     EventDetailView.as_view(),
+    #     name="event-detail-by-name",
+    # ),
+    # path(
+    #     "by-date/<int:day>/<int:month>/<int:year>/",
+    #     EventDetailView.as_view(),
+    #     name="event-detail-by-date",
+    # ),
     path(
-        "by-name/<str:name>/",
+        "<str:event_id>/",
         EventDetailView.as_view(),
-        name="event-detail-by-name",
-    ),
-    path(
-        "by-date/<int:day>/<int:month>/<int:year>/",
-        EventDetailView.as_view(),
-        name="event-detail-by-date",
-    ),
-    path(
-        "<str:name>/delete/",
-        EventDeleteView.as_view(),
         name="event-delete",
     ),
 ]

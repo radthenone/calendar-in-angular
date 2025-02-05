@@ -1,5 +1,7 @@
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.users.models import User
@@ -25,8 +27,8 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name": {"required": False, "write_only": True},
         }
 
-    @staticmethod
-    def get_full_name(obj):
+    @extend_schema_field(field=OpenApiTypes.STR)
+    def get_full_name(self, obj) -> str:
         if not obj.first_name and not obj.last_name:
             return ""
         return f"{obj.first_name} {obj.last_name}"
@@ -54,6 +56,7 @@ class UserListSerializer(serializers.ModelSerializer):
 
         read_only_fields = [
             "id",
+            "email",
             "last_login_date",
             "last_login_time",
         ]

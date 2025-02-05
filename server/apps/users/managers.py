@@ -1,16 +1,21 @@
+import logging
 import uuid
 from typing import TYPE_CHECKING, Optional
 
 import jwt
 from django.conf import settings
 from django.contrib.auth.base_user import BaseUserManager
-from django.db import models
+from django.core.exceptions import ValidationError
+from django.db import models, transaction
 from django.db.models import QuerySet
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 if TYPE_CHECKING:
     from apps.users.models import User
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserManager(BaseUserManager):
@@ -34,32 +39,46 @@ class UserManager(BaseUserManager):
         except self.model.DoesNotExist:
             return None
 
-    def create_user(
-        self, email: str, password: str, **extra_fields
-    ) -> Optional["User"]:
+    def create_user(self, email: str, password: str, **kwargs) -> Optional["User"]:
         if not email:
-            raise ValueError("The Email field must be set")
+            logger.error("The Email field must be set")
+            raise ValidationError("The Email field must be set")
+
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email=email, **kwargs)
         user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, email: str, password: str, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("is_active", True)
-        return self.create_user(email, password, **extra_fields)
+    def create_superuser(self, email: str, password: str, **kwargs):
+        kwargs.setdefault("is_staff", True)
+        kwargs.setdefault("is_superuser", True)
+        kwargs.setdefault("is_active", True)
+        return self.create_user(email, password, **kwargs)
 
     def update_user(self, user_id: uuid.UUID, **kwargs) -> Optional["User"]:
         try:
-            user = self.get(id=user_id)
-            for key, value in kwargs.items():
-                setattr(user, key, value)
-            user.save()
-            return user
+            with transaction.atomic():
+                user = self.model(id=user_id)
+
+                if "password" in kwargs:
+                    user.set_password(kwargs.pop("password"))
+
+                if "email" in kwargs:
+                    user.email = self.normalize_email(kwargs.pop("email"))
+
+                for key, value in kwargs.items():
+                    setattr(user, key, value)
+
+                user.save()
+                return user
+
         except self.model.DoesNotExist:
             return None
+
+        except Exception as e:
+            logger.error(f"Error updating user: {e}")
+            raise ValidationError(f"Error updating user: {e}")
 
     def delete_user(self, user_id: uuid.UUID) -> bool:
         try:
@@ -67,15 +86,18 @@ class UserManager(BaseUserManager):
             user.delete()
             return True
         except self.model.DoesNotExist:
-            return False
+            raise ValidationError("User does not exist")
 
     def last_login_update(
         self,
         user_id: uuid.UUID,
     ) -> None:
-        user = self.get(id=user_id)
-        user.last_login = timezone.now()
-        user.save(update_fields=["last_login"])
+        try:
+            user = self.get(id=user_id)
+            user.last_login = timezone.now()
+            user.save(update_fields=["last_login"])
+        except self.model.DoesNotExist:
+            raise ValidationError("User does not exist")
 
     def get_all_users(self) -> QuerySet["User"]:
         return self.all()
@@ -84,7 +106,9 @@ class UserManager(BaseUserManager):
         return self.filter(last_login__isnull=False).order_by("-last_login")
 
     def update_password(
-        self, user_id: uuid.UUID, new_password: str
+        self,
+        user_id: uuid.UUID,
+        new_password: str,
     ) -> Optional["User"]:
         user = self.get_user_by_id(user_id)
         user.set_password(new_password)
@@ -98,9 +122,11 @@ class AuthManager(models.Manager):
         try:
             user = self.get(email=email)
         except self.model.DoesNotExist:
-            return None
+            raise ValidationError("User does not exist")
+
         if user.check_password(password) and user.is_active:
             return user
+
         return None
 
     @staticmethod
