@@ -1,13 +1,21 @@
 from django.urls import path
 
-from apps.auth.views import LoginViewSet, RegisterView, TokenRefreshViewSet
+from apps.auth.views import LoginView, RegisterView, TokenRefreshView
 
 urlpatterns = [
-    path("register/", RegisterView.as_view(), name="register"),
-    path("login/", LoginViewSet.as_view({"post": "create"}), name="login"),
     path(
-        "refresh-token/",
-        TokenRefreshViewSet.as_view({"post": "create"}),
-        name="refresh-token",
+        "register/",
+        RegisterView.as_view(),
+        name="register",
+    ),
+    path(
+        "login/",
+        LoginView.as_view(),
+        name="login",
+    ),
+    path(
+        "refresh/",
+        TokenRefreshView.as_view(),
+        name="refresh",
     ),
 ]

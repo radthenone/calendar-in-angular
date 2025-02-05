@@ -1,6 +1,7 @@
 import uuid
+from tkinter.scrolledtext import example
 
-from drf_spectacular.utils import OpenApiExample, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import generics, mixins, status
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
@@ -18,9 +19,13 @@ class EventListView(
 ):
     permission_classes = [IsAuthenticated]
     serializer_class = EventSerializer
+    queryset = Event.objects.all()
 
     def get_queryset(self):
-        return Event.objects.filter(user=self.request.user)
+        user = self.request.user
+        if user:
+            return Event.objects.filter(user=self.request.user)
+        return Event.objects.none()
 
     @extend_schema(
         tags=["events"],

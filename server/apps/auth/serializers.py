@@ -1,51 +1,11 @@
 from typing import Optional
 
+from django.utils import timezone
 from rest_framework import serializers, status
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from apps.users.models import User
-
-
-class RegisterSerializer(serializers.ModelSerializer):
-    rewrite_password = serializers.CharField(write_only=True, required=True)
-
-    class Meta:
-        model = User
-        fields = [
-            "id",
-            "email",
-            "password",
-            "rewrite_password",
-            "first_name",
-            "last_name",
-        ]
-
-        extra_kwargs = {
-            "email": {"required": True},
-            "password": {"write_only": True, "required": True},
-            "first_name": {"required": False, "write_only": True},
-            "last_name": {"required": False, "write_only": True},
-        }
-
-    def validate(self, attrs):
-        if attrs.get("password") != attrs.get("rewrite_password"):
-            raise serializers.ValidationError("Passwords do not match")
-        return attrs
-
-    def validate_email(self, value: str):  # noqa
-        if "@" not in value:
-            raise serializers.ValidationError("Invalid email")
-
-        if User.objects.get_user_by_email(email=value):
-            raise serializers.ValidationError("User with this email already exists")
-        return value
-
-    def create(self, validated_data):
-        validated_data.pop("rewrite_password")
-
-        User.objects.create_user(**validated_data)
-        return validated_data
 
 
 class TokenSerializer(TokenObtainPairSerializer):
@@ -77,6 +37,65 @@ class TokenSerializer(TokenObtainPairSerializer):
             raise serializers.ValidationError("Invalid token")
 
 
+class RegisterSerializer(serializers.ModelSerializer):
+    rewrite_password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "password",
+            "rewrite_password",
+            "first_name",
+            "last_name",
+        ]
+
+        extra_kwargs = {
+            "email": {"required": True},
+            "password": {"required": True, "write_only": True},
+            "first_name": {"required": False, "write_only": True},
+            "last_name": {"required": False, "write_only": True},
+        }
+
+    def validate(self, attrs):
+        if attrs.get("password") != attrs.get("rewrite_password"):
+            raise serializers.ValidationError("Passwords do not match")
+        return attrs
+
+    def validate_email(self, value: str):  # noqa
+        if "@" not in value:
+            raise serializers.ValidationError("Invalid email")
+
+        if User.objects.get_user_by_email(email=value):
+            raise serializers.ValidationError("User with this email already exists")
+        return value
+
+    def create(self, validated_data):
+        validated_data.pop("rewrite_password")
+
+        user = User.objects.create_user(**validated_data)
+        from django.utils import timezone
+
+        user.last_login = timezone.now()
+        user.save(update_fields=["last_login"])
+
+        user.access = TokenSerializer.get_refresh_token(user)
+        user.refresh = TokenSerializer.get_access_token(user)
+
+        return user
+
+    def to_representation(self, instance):
+        return {
+            "access": str(instance.access),
+            "refresh": str(instance.refresh),
+            "user": {
+                "id": instance.id,
+                "email": instance.email,
+            },
+        }
+
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
@@ -100,12 +119,23 @@ class LoginSerializer(serializers.Serializer):
                 code=status.HTTP_400_BAD_REQUEST,
             )
 
-        User.objects.last_login_update(user_id=user.id)
+        user.last_login = timezone.now()
+        user.save(update_fields=["last_login"])
 
-        attrs["access_token"] = TokenSerializer.get_refresh_token(user)
-        attrs["refresh_token"] = TokenSerializer.get_access_token(user)
-
+        attrs["user"] = user
+        attrs["access"] = TokenSerializer.get_refresh_token(user)
+        attrs["refresh"] = TokenSerializer.get_access_token(user)
         return attrs
+
+    def to_representation(self, instance):
+        return {
+            "access": str(instance["access"]),
+            "refresh": str(instance["refresh"]),
+            "user": {
+                "id": instance["user"].id,
+                "email": instance["user"].email,
+            },
+        }
 
 
 class RefreshTokenSerializer(serializers.Serializer):
@@ -128,7 +158,17 @@ class RefreshTokenSerializer(serializers.Serializer):
                 code=status.HTTP_404_NOT_FOUND,
             )
 
-        attrs["access_token"] = TokenSerializer.get_refresh_token(user)
-        attrs["refresh_token"] = TokenSerializer.get_access_token(user)
-
+        attrs["user"] = user
+        attrs["access"] = TokenSerializer.get_refresh_token(user)
+        attrs["refresh"] = TokenSerializer.get_access_token(user)
         return attrs
+
+    def to_representation(self, instance):
+        return {
+            "access": str(instance["access"]),
+            "refresh": str(instance["refresh"]),
+            "user": {
+                "id": instance["user"].id,
+                "email": instance["user"].email,
+            },
+        }

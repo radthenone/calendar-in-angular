@@ -23,5 +23,10 @@ class User(AbstractUser):
     objects = UserManager()
     auth = AuthManager()
 
+    class Meta:
+        verbose_name = "user"
+        verbose_name_plural = "users"
+        db_table = "users"
+
     def __str__(self):
         return self.email

@@ -33,13 +33,15 @@ class UserSerializer(serializers.ModelSerializer):
             return ""
         return f"{obj.first_name} {obj.last_name}"
 
-    def update(self, instance, validated_data):
-        return User.objects.update_user(
+    def update(self, instance, validated_data) -> "User":
+        user = User.objects.update_user(
             user_id=instance.id,
             email=validated_data.get("email", instance.email),
             first_name=validated_data.get("first_name", instance.first_name),
             last_name=validated_data.get("last_name", instance.last_name),
+            **validated_data,
         )
+        return user
 
 
 class UserListSerializer(serializers.ModelSerializer):
@@ -91,9 +93,9 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(list(error.messages))
         return value
 
-    def update(self, instance, validated_data):
-        instance = User.objects.update_password(
+    def update(self, instance, validated_data) -> "User":
+        user = User.objects.update_password(
             user_id=instance.id,
             new_password=validated_data.get("new_password"),
         )
-        return instance
+        return user

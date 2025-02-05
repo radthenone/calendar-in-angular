@@ -32,6 +32,9 @@ class Event(models.Model):
     objects = EventManager()
 
     class Meta:
+        verbose_name = "event"
+        verbose_name_plural = "events"
+        db_table = "events"
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "name"],

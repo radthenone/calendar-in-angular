@@ -88,16 +88,8 @@ class UserManager(BaseUserManager):
         except self.model.DoesNotExist:
             raise ValidationError("User does not exist")
 
-    def last_login_update(
-        self,
-        user_id: uuid.UUID,
-    ) -> None:
-        try:
-            user = self.get(id=user_id)
-            user.last_login = timezone.now()
-            user.save(update_fields=["last_login"])
-        except self.model.DoesNotExist:
-            raise ValidationError("User does not exist")
+    def update_last_login(self, user_id: uuid.UUID) -> None:
+        self.filter(id=user_id).update(last_login=timezone.now())
 
     def get_all_users(self) -> QuerySet["User"]:
         return self.all()
@@ -132,13 +124,17 @@ class AuthManager(models.Manager):
     @staticmethod
     def decode_token(token: AccessToken | RefreshToken) -> Optional[dict[str, any]]:
         try:
-            payload = jwt.decode(
+            payload: dict[str, any] = jwt.decode(
                 str(token),
                 key=settings.SECRET_KEY,
                 algorithms=[settings.SIMPLE_JWT["ALGORITHM"]],
             )
             return payload
-        except jwt.ExpiredSignatureError:
+
+        except jwt.PyJWTError as error:
+            logger.error(f"Error decoding token: {error}")
             return None
-        except jwt.InvalidSignatureError:
+
+        except Exception as error:
+            logger.error(f"Error decoding token: {error}")
             return None
