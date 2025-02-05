@@ -145,8 +145,8 @@ class RefreshTokenSerializer(serializers.Serializer):
         payload = TokenSerializer.decode_token(attrs.get("refresh"))
         if payload is None:
             raise serializers.ValidationError(
-                detail="Invalid refresh token",
-                code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid token",
+                code=status.HTTP_401_UNAUTHORIZED,
             )
         user = User.objects.get_user_by_id_and_email(
             user_id=payload.get("user_id"),
