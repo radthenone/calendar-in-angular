@@ -1,9 +1,10 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from apps.events.views import (
     EventCreateView,
     EventDetailView,
     EventListView,
+    EventMonthFilterListView,
 )
 
 urlpatterns = [
@@ -27,16 +28,11 @@ urlpatterns = [
         EventDetailView.as_view(),
         name="event-update",
     ),
-    # path(
-    #     "by-name/<str:name>/",
-    #     EventDetailView.as_view(),
-    #     name="event-detail-by-name",
-    # ),
-    # path(
-    #     "by-date/<int:day>/<int:month>/<int:year>/",
-    #     EventDetailView.as_view(),
-    #     name="event-detail-by-date",
-    # ),
+    re_path(
+        r"^(?P<year>\d{4})/(?P<month>\d{1,2})/$",
+        EventMonthFilterListView.as_view(),
+        name="event-month-filter",
+    ),
     path(
         "<str:event_id>/",
         EventDetailView.as_view(),

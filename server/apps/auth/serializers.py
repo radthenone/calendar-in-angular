@@ -80,8 +80,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.last_login = timezone.now()
         user.save(update_fields=["last_login"])
 
-        user.access = TokenSerializer.get_refresh_token(user)
-        user.refresh = TokenSerializer.get_access_token(user)
+        user.access = TokenSerializer.get_access_token(user)
+        user.refresh = TokenSerializer.get_refresh_token(user)
 
         return user
 
@@ -123,8 +123,8 @@ class LoginSerializer(serializers.Serializer):
         user.save(update_fields=["last_login"])
 
         attrs["user"] = user
-        attrs["access"] = TokenSerializer.get_refresh_token(user)
-        attrs["refresh"] = TokenSerializer.get_access_token(user)
+        attrs["access"] = TokenSerializer.get_access_token(user)
+        attrs["refresh"] = TokenSerializer.get_refresh_token(user)
         return attrs
 
     def to_representation(self, instance):
@@ -159,8 +159,8 @@ class RefreshTokenSerializer(serializers.Serializer):
             )
 
         attrs["user"] = user
-        attrs["access"] = TokenSerializer.get_refresh_token(user)
-        attrs["refresh"] = TokenSerializer.get_access_token(user)
+        attrs["access"] = TokenSerializer.get_access_token(user)
+        attrs["refresh"] = TokenSerializer.get_refresh_token(user)
         return attrs
 
     def to_representation(self, instance):

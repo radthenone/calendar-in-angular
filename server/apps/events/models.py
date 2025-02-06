@@ -41,6 +41,7 @@ class Event(models.Model):
                 name="unique_event_name_per_user",
             )
         ]
+        indexes = [models.Index(fields=["start_datetime", "end_datetime"])]
 
     def __str__(self):
         return f"Event: {self.name}"

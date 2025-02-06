@@ -1,3 +1,4 @@
+import calendar
 import logging
 import uuid
 from datetime import datetime
@@ -5,6 +6,10 @@ from typing import TYPE_CHECKING, Optional
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models, transaction
+from django.db.models import Q, QuerySet
+from django.utils import timezone
+
+from apps.events.utils import get_next_month, get_prev_month, grid_range_for_month
 
 if TYPE_CHECKING:
     from apps.events.models import Event
@@ -142,3 +147,32 @@ class EventManager(models.Manager):
         except Exception as error:
             logger.error(f"Failed to delete event with id {event_id}.")
             raise ValidationError(f"Failed to delete event: {error}")
+
+    def filter_calendar_month_events(
+        self, user: "User", month: int, year: int
+    ) -> QuerySet["Event"]:
+        """
+        For a given user, it downloads events for three months (previous, current, next),
+        Where the month is represented by a network of 42 fields (tiles) on the calendar.
+        """
+        # current date
+        current_start, current_end = grid_range_for_month(year, month)
+
+        # previous date
+        prev_year, prev_month = get_prev_month(year, month)
+        prev_start, prev_end = grid_range_for_month(prev_year, prev_month)
+
+        # next date
+        next_year, next_month = get_next_month(year, month)
+        next_start, next_end = grid_range_for_month(next_year, next_month)
+
+        # calculate overall start and end dates
+        overall_start = min(prev_start, current_start, next_start)
+        overall_end = max(prev_end, current_end, next_end)
+
+        # get events for the current month
+        events = self.filter(
+            user=user, start_datetime__lte=overall_start, end_datetime__gte=overall_end
+        ).order_by("start_datetime")
+
+        return events

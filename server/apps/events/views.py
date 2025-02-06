@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from tkinter.scrolledtext import example
 
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
@@ -98,3 +99,28 @@ class EventDetailView(
     )
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
+class EventMonthFilterListView(generics.GenericAPIView, mixins.ListModelMixin):
+    permission_classes = [IsAuthenticated]
+    serializer_class = EventSerializer
+
+    def get_queryset(self):
+        today = datetime.now()
+
+        user = self.request.user
+        month = int(self.kwargs.get("month", today.month))
+        year = int(self.kwargs.get("year", today.year))
+
+        return Event.objects.filter_calendar_month_events(
+            user=user,
+            month=month,
+            year=year,
+        )
+
+    @extend_schema(
+        tags=["events"],
+        request=EventSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
