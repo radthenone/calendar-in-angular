@@ -172,7 +172,9 @@ class EventManager(models.Manager):
 
         # get events for the current month
         events = self.filter(
-            user=user, start_datetime__lte=overall_start, end_datetime__gte=overall_end
+            user=user,
+            start_datetime__gte=overall_start,
+            end_datetime__lte=overall_end,
         ).order_by("start_datetime")
 
         return events

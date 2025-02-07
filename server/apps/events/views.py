@@ -108,14 +108,10 @@ class EventMonthFilterListView(generics.GenericAPIView, mixins.ListModelMixin):
     def get_queryset(self):
         today = datetime.now()
 
-        user = self.request.user
-        month = int(self.kwargs.get("month", today.month))
-        year = int(self.kwargs.get("year", today.year))
-
         return Event.objects.filter_calendar_month_events(
-            user=user,
-            month=month,
-            year=year,
+            user=self.request.user,
+            month=int(self.kwargs.get("month", today.month)),
+            year=int(self.kwargs.get("year", today.year)),
         )
 
     @extend_schema(

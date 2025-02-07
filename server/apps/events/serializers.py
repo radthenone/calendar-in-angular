@@ -48,8 +48,6 @@ class EventSerializer(serializers.ModelSerializer):
             "start_time",
             "end_date",
             "end_time",
-            "start_datetime",
-            "end_datetime",
             # nested fields
             "user",
         ]
@@ -72,8 +70,8 @@ class EventSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data["start_date"] = instance.start_datetime.strftime(format="%Y-%m-%d")
-        data["start_time"] = instance.start_datetime.strftime(format="%H:%M:%S")
         data["end_date"] = instance.end_datetime.strftime(format="%Y-%m-%d")
+        data["start_time"] = instance.start_datetime.strftime(format="%H:%M:%S")
         data["end_time"] = instance.end_datetime.strftime(format="%H:%M:%S")
         return data
 
